@@ -1,3 +1,0 @@
-# java-leetcode
-
-bruce
