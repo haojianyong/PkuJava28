@@ -1,0 +1,22 @@
+class MyQueue {
+    // Push element x to the back of queue.
+    ArrayList<Integer> q=new ArrayList<Integer>();
+    public void push(int x) {
+        q.add(x);
+    }
+
+    // Removes the element from in front of queue.
+    public void pop() {
+        if(q.size()!=0)q.remove(0);
+    }
+
+    // Get the front element.
+    public int peek() {
+        return q.get(0);
+    }
+
+    // Return whether the queue is empty.
+    public boolean empty() {
+        return q.isEmpty();
+    }
+}
