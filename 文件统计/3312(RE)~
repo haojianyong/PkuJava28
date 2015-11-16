@@ -1,0 +1,273 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Scanner;
+import java.util.Stack;
+import java.util.Comparator;
+
+class Node{
+	public int status;
+	public int row;
+	public int col;
+	public Node parent;
+	public Node(int s,int r,int c,Node p){
+		this.status=s;
+		this.row=r;
+		this.col=c;
+		this.parent=p;
+	}
+	public Node(){
+		this.parent=null;
+	}
+	public Node turnLeft(){
+		if(this.status==0){
+			Node child=new Node(1,this.row,this.col-2,this);
+			return child;
+		}
+		else if(this.status==1){
+			Node child=new Node(0,this.row,this.col-1,this);
+			return child;
+		}
+		else if(this.status==2){
+			Node child=new Node(2,this.row,this.col-1,this);
+			return child;
+		}
+		return null;
+	}
+	public Node turnRight(){
+		if(this.status==0){
+			Node child=new Node(1,this.row,this.col+1,this);
+			return child;
+		}
+		else if(this.status==1){
+			Node child=new Node(0,this.row,this.col+2,this);
+			return child;
+		}
+		else if(this.status==2){
+			Node child=new Node(2,this.row,this.col+1,this);
+			return child;
+		}
+		return null;
+	}
+	public Node turnUp(){
+		if(this.status==0){
+			Node child=new Node(2,this.row-2,this.col,this);
+			return child;
+		}
+		else if(this.status==1){
+			Node child=new Node(1,this.row-1,this.col,this);
+			return child;
+		}
+		else if(this.status==2){
+			Node child=new Node(0,this.row-1,this.col,this);
+			return child;
+		}
+		return null;
+	}
+	public Node turnDown(){
+		if(this.status==0){
+			Node child=new Node(2,this.row+1,this.col,this);
+			return child;
+		}
+		else if(this.status==1){
+			Node child=new Node(1,this.row+1,this.col,this);
+			return child;
+		}
+		else if(this.status==2){
+			Node child=new Node(0,this.row+2,this.col,this);
+			return child;
+		}
+		return null;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		Node o=(Node)obj;
+		if(this.status==o.status&&this.row==o.row&&this.col==o.col){
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		String str=String.format("[%d,%d,%d]", this.status,this.row,this.col).toString();
+		return str;
+	}
+	public boolean canTurnLeft(char[][] table){
+		boolean res=false;
+		if(status==0){
+			if(this.col-2>=0&&table[this.row][this.col-1]!='#'&&table[this.row][this.col-2]!='#'){
+				res=true;
+			}
+		}
+		else if(status==1){
+			if(this.col-1>=0&&(table[this.row][this.col-1]=='.'||table[this.row][this.col-1]=='O')){
+					res=true;
+			}
+		}
+		else if(status==2){
+			if(this.col-1>=0&&table[this.row][this.col-1]!='#'&&table[this.row+1][this.col-1]!='#'){
+				res=true;
+			}
+		}
+		return res;
+	}
+	public boolean canTurnRight(char[][] table){
+		boolean res=false;
+		if(status==0){
+			if(this.col+2<table[0].length&&table[this.row][this.col+1]!='#'&&table[this.row][this.col+2]!='#'){
+				res=true;
+			}
+		}
+		else if(status==1){
+			if(this.col+2<table[0].length&&(table[this.row][this.col+2]=='.'||table[this.row][this.col+2]=='O')){
+					res=true;
+			}
+		}
+		else if(status==2){
+			if(this.col+1<table[0].length&&table[this.row][this.col+1]!='#'&&table[this.row+1][this.col+1]!='#'){
+				res=true;
+			}
+		}
+		return res;
+	}
+	public boolean canTurnUp(char[][] table){
+		boolean res=false;
+		if(status==0){
+			if(this.row-2>=0&&table[this.row-2][this.col]!='#'&&table[this.row-1][this.col]!='#'){
+				res=true;
+			}
+		}
+		else if(status==1){
+			if(this.row-1>=0&&table[this.row-1][this.col]!='#'&&table[this.row-1][this.col+1]!='#'){
+					res=true;
+			}
+		}
+		else if(status==2){
+			if(this.row-1>=0&&(table[this.row-1][this.col]=='.'||table[this.row-1][this.col]=='O')){
+				res=true;
+			}
+		}
+		return res;
+	}
+	public boolean canTurnDown(char[][] table){
+		boolean res=false;
+		if(status==0){
+			if(this.row+2<table.length&&table[this.row+1][this.col]!='#'&&table[this.row+2][this.col]!='#'){
+				res=true;
+			}
+		}
+		else if(status==1){
+			if(this.row+1<table.length&&table[this.row+1][this.col]!='#'&&table[this.row+1][this.col+1]!='#'){
+					res=true;
+			}
+		}
+		else if(status==2){
+			if(this.row+2<table.length&&(table[this.row+2][this.col]=='.'||table[this.row+2][this.col]=='O')){
+				res=true;
+			}
+		}
+		return res;
+	}
+}
+public class Main {
+	public static boolean isIn(boolean[][][] status,Node n){
+		return status[n.status][n.row][n.col];
+	}
+	public static void setIn(boolean[][][] status,Node n){
+		status[n.status][n.row][n.col]=true;
+	}
+	public static void main(String[] args) throws IOException{
+		// TODO Auto-generated method stub
+		//FileInputStream fis=new FileInputStream("data");
+		Scanner scan=new Scanner(System.in);
+		int row=scan.nextInt();
+		int col=scan.nextInt();
+		while(!(row==0&&col==0)){
+		Node start=null,end = null;
+		char[][] table=new char[row][col];
+		boolean[][][] status=new boolean[3][row][col];
+		for(int i=0;i<3;i++){
+			for(int j=0;j<status[0].length;j++){
+				for(int k=0;k<status[0][0].length;k++)
+					status[i][j][k]=false;
+			}
+		}
+		ArrayList<Node> que=new ArrayList<Node>();
+		for(int i=0;i<row;i++){
+			String str=scan.next();
+			for(int j=0;j<col;j++){
+				table[i][j]=str.charAt(j);
+			}
+		}
+		flag1:
+		for(int i=0;i<row;i++){
+			for(int j=0;j<col;j++){
+				if(table[i][j]=='X'&&table[i][j+1]!='X'&&table[i+1][j]!='X'){
+					start=new Node(0,i,j,null);
+					que.add(start);
+					break flag1;
+				}
+				else if(table[i][j]=='X'&&table[i][j+1]=='X'&&table[i+1][j]!='X'){
+					start=new Node(1,i,j,null);
+					que.add(start);
+					break flag1;
+				}
+				else if(table[i][j]=='X'&&table[i][j+1]!='X'&&table[i+1][j]=='X'){
+					start=new Node(2,i,j,null);
+					que.add(start);
+					break flag1;
+				}
+			}
+		}
+		flag2:
+		for(int i=0;i<row;i++){
+			for(int j=0;j<col;j++){
+				if(table[i][j]=='O'){
+					end=new Node(0,i,j,null);
+					break flag2;
+				}
+			}
+		}
+		int index;
+		boolean find=false;
+		for(index=0;index<que.size();index++){
+			Node cur=que.get(index);
+			if(cur.equals(end)){
+				find=true;
+				break;
+			}
+			if(cur.canTurnLeft(table)&&!isIn(status,cur.turnLeft())){
+				que.add(cur.turnLeft());
+				setIn(status,cur.turnLeft());
+			}
+			if(cur.canTurnRight(table)&&!isIn(status,cur.turnRight())){
+				que.add(cur.turnRight());
+				setIn(status,cur.turnRight());
+			}
+			if(cur.canTurnUp(table)&&!isIn(status,cur.turnUp())){
+				que.add(cur.turnUp());
+				setIn(status,cur.turnUp());
+			}
+			if(cur.canTurnDown(table)&&!isIn(status,cur.turnDown())){
+				que.add(cur.turnDown());
+				setIn(status,cur.turnDown());
+			}
+		}
+		int count=0;
+		Node cur=que.get(que.indexOf(end));
+		while(!cur.equals(start)){
+			count++;
+			cur=cur.parent;
+		}
+		System.out.println(count);
+		row=scan.nextInt();
+		col=scan.nextInt();
+		}
+	}
+}
+

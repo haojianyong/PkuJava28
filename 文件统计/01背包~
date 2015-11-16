@@ -1,0 +1,63 @@
+package oj;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Scanner;
+import java.util.Stack;
+
+class Item{
+	public int weight;
+	public int value;
+	public boolean isChosen;
+	public Item(int weight,int value){
+		this.weight=weight;
+		this.value=value;
+		this.isChosen=false;
+	}
+}
+public class Solution {
+	public static void disp(int[][] table,int row,int col){
+		for(int i=0;i<row;i++){
+			for(int j=0;j<col;j++){
+				System.out.print(table[i][j]+" ");
+			}
+			System.out.println();
+		}
+	}
+	public static int maxValue(ArrayList<Item> items,int[][] table,int itemIndex,int weightLimits){
+		int maxValue=0;
+		if(itemIndex<0||weightLimits<=0)
+			return maxValue;
+		if(weightLimits<items.get(itemIndex).weight){
+			if(table[itemIndex][weightLimits]==0){
+				table[itemIndex][weightLimits]=maxValue(items,table,itemIndex-1,weightLimits);
+			}
+			return table[itemIndex][weightLimits];
+		}
+		if(table[itemIndex][weightLimits]==0){
+			table[itemIndex][weightLimits]=Math.max(items.get(itemIndex).value+maxValue(items, table,itemIndex-1,weightLimits-items.get(itemIndex).weight),maxValue(items,table,itemIndex-1,weightLimits));
+		}
+		return table[itemIndex][weightLimits];
+	}
+	public static void main(String[] args) throws IOException{
+		// TODO Auto-generated method stub
+		FileInputStream fis=new FileInputStream("data (copy)");
+		Scanner scan=new Scanner(fis);
+		int numCases=scan.nextInt();
+		for(int i=0;i<numCases;i++){
+			int weightLimits=scan.nextInt();
+			int numItems=scan.nextInt();
+			ArrayList<Item> items=new ArrayList<Item>();
+			for(int j=0;j<numItems;j++){
+				Item item=new Item(scan.nextInt(),scan.nextInt());
+				items.add(item);
+			}
+			int[][] table=new int[numItems][weightLimits+1];
+			System.out.println(maxValue(items,table,numItems-1,weightLimits));
+		}
+	}
+}
+

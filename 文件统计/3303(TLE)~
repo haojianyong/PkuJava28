@@ -1,0 +1,130 @@
+package oj;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Scanner;
+import java.util.Stack;
+class Hall{
+	public int hallId;
+	public ArrayList<Request> table;
+	public Hall(int id){
+		this.hallId=id;
+		this.table=new ArrayList<Request>();
+	}
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		Hall hall=(Hall)obj;
+		return this.hallId==hall.hallId;
+	}
+}
+class Request implements Comparable<Request>{
+	public int sTime;
+	public int eTime;
+	public int nChoices;
+	public int index;
+	public ArrayList<Hall> candidates;
+	public Request(int stime,int etime,int nchoices){
+		this.sTime=stime;
+		this.eTime=etime;
+		this.nChoices=nchoices;
+		index=-1;
+		candidates=new ArrayList<Hall>();
+	}
+	@Override
+	public int compareTo(Request o) {
+		// TODO Auto-generated method stub
+		if(this.eTime<o.eTime)
+			return 1;
+		if(this.eTime>o.eTime)
+			return -1;
+		return 0;
+	}
+	public int canAllocate(){
+		int result=-1;
+		for(int i=this.index+1;i<this.nChoices;i++){
+			if(this.candidates.get(i).table.isEmpty()){
+				result=i;
+				break;
+			}
+			if(this.candidates.get(i).table.get(this.candidates.get(i).table.size()-1).eTime<this.sTime){
+				result=i;
+				break;
+			}
+		}
+		return result;
+	}
+}
+public class Solution {
+	public static void main(String[] args) throws IOException{
+		// TODO Auto-generated method stub
+		FileInputStream fis=new FileInputStream("data2");
+		Scanner scan=new Scanner(fis);
+		int numCases=scan.nextInt();
+		for(int i=0;i<numCases;i++){
+			int numRequests=scan.nextInt();
+			Stack<Request> waitingLine=new Stack<Request>();
+			Stack<Request> allocatedLine=new Stack<Request>();
+			ArrayList<Hall> halls=new ArrayList<Hall>();
+			for(int j=0;j<numRequests;j++){
+				Request req=new Request(scan.nextInt(),scan.nextInt(),scan.nextInt());
+				for(int k=0;k<req.nChoices;k++){
+					Hall hall=new Hall(scan.nextInt());
+					Hall phall;
+					if(!halls.contains(hall)){
+						halls.add(hall);
+					}
+					phall=halls.get(halls.indexOf(hall));
+					req.candidates.add(phall);
+				}
+				waitingLine.add(req);
+			}
+			waitingLine.sort(new Comparator<Request>(){
+				@Override
+				public int compare(Request o1, Request o2) {
+					// TODO Auto-generated method stub
+					return o1.compareTo(o2);
+				}
+			});
+			boolean result=true;
+			while(!waitingLine.isEmpty()){
+				Request req=waitingLine.peek();
+				int index=req.canAllocate();
+				if(index!=-1){
+					req.index=index;
+					req.candidates.get(index).table.add(req);
+					waitingLine.pop();
+					allocatedLine.push(req);
+				}
+				else{
+					if(allocatedLine.isEmpty()){
+						result=false;
+						break;
+					}
+					req.index=-1;
+					req=allocatedLine.pop();
+					waitingLine.push(req);
+					req.candidates.get(req.index).table.remove(req);
+				}
+			}
+//			for(Hall hall:halls){
+//				System.out.println(hall.hallId);
+//				for(Request req:hall.table){
+//					String str=String.format("%d,%d", req.sTime,req.eTime)+":";
+//					for(int x=0;x<req.nChoices;x++){
+//						str+=req.candidates.get(x).hallId+" ";
+//					}
+//					System.out.println(str);
+//				}
+//			}
+			if(result)
+				System.out.println("YES");
+			else
+				System.out.println("NO");
+		}
+	}
+}
+
